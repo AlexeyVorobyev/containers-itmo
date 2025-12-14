@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app.kubernetes.io/name: announcements
+    app.kubernetes.io/component: app
+    app.kubernetes.io/part-of: announcements-board
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: announcements
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: announcements
+        app.kubernetes.io/component: app
+        tier: backend
+    spec:
+      initContainers:
+      - name: init-db
+        image: postgres:16
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: init-sql
+          mountPath: /init
+          readOnly: true
+        command:
+        - sh
+        - -ceu
+        - |
+          echo "Waiting for Postgres..."
+          until pg_isready -h postgres-service -p 5432 -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
+            sleep 2
+          done
+          echo "Running schema init..."
+          PGPASSWORD="$POSTGRES_PASSWORD" psql -h postgres-service -p 5432 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f /init/init.sql
+          echo "Init done."
+      containers:
+      - name: app
+        image: announcements-app:latest
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        ports:
+        - name: http
+          containerPort: 5000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DATABASE_URL
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            path: /healthcheck
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 6
+      volumes:
+      - name: init-sql
+        configMap:
+          name: init-sql
+          items:
+          - key: init.sql
+            path: init.sql

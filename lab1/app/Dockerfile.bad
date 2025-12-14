@@ -1,0 +1,19 @@
+FROM python:latest
+
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends curl
+RUN apt-get install -y --no-install-recommends ca-certificates
+
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+
+RUN sh /uv-installer.sh
+
+ENV PATH="/root/.local/bin/:$PATH"
+
+COPY . .
+
+RUN uv sync
+
+ENV PATH="/.venv/bin:$PATH"
+
+CMD ["python", "-m", "src.main"]

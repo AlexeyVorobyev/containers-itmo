@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-sql
+  labels:
+    app.kubernetes.io/name: announcements
+    app.kubernetes.io/component: init
+data:
+  init.sql: |
+    CREATE SCHEMA IF NOT EXISTS public;
+
+    CREATE TABLE IF NOT EXISTS public.announcements (
+      id BIGSERIAL PRIMARY KEY,
+      title VARCHAR(140) NOT NULL,
+      text  TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_announcements_created_at
+      ON public.announcements (created_at DESC);

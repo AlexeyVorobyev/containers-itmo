@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app.kubernetes.io/name: announcements
+    app.kubernetes.io/component: app
+data:
+  DATABASE_URL: postgresql://ann_user:ann_pass@postgres-service:5432/announcements

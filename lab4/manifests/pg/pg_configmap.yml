@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app.kubernetes.io/name: announcements
+    app.kubernetes.io/component: database
+data:
+  POSTGRES_DB: announcements
