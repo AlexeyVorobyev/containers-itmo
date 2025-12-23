@@ -6,7 +6,7 @@
 
 ### ConfigMap
 - `postgres-config` — хранит `POSTGRES_DB`.
-- `app-config` — хранит `DATABASE_URL`, `ANNOUNCEMENTS_TABLE`, `DEBUG`.
+- `app-config` — хранит `PGHOST`, `PGPORT`, `PGDATABASE` для приложения.
 - `init-sql` — хранит SQL-скрипт `init.sql` для создания схемы/таблицы/индекса.
 
 ### Secret

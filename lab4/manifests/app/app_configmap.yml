@@ -6,4 +6,6 @@ metadata:
     app.kubernetes.io/name: announcements
     app.kubernetes.io/component: app
 data:
-  DATABASE_URL: postgresql://ann_user:ann_pass@postgres-service:5432/announcements
+  PGHOST: postgres-service
+  PGPORT: "5432"
+  PGDATABASE: announcements

@@ -23,22 +23,11 @@ spec:
       - name: init-db
         image: postgres:16
         imagePullPolicy: IfNotPresent
-        env:
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-config
-              key: POSTGRES_DB
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_PASSWORD
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+        - secretRef:
+            name: postgres-secret
         volumeMounts:
         - name: init-sql
           mountPath: /init
@@ -68,12 +57,11 @@ spec:
         ports:
         - name: http
           containerPort: 5000
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: DATABASE_URL
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: postgres-secret
         readinessProbe:
           httpGet:
             path: /healthcheck
