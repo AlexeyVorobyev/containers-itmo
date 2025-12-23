@@ -84,11 +84,14 @@ metadata:
   labels:
     app: nextcloud
 data:
+  ALLOW_EMPTY_PASSWORD: "yes"
   NEXTCLOUD_UPDATE: '1'
+  NEXTCLOUD_ADMIN_USER: "any_name_you_want"
   NEXTCLOUD_TRUSTED_DOMAINS: "127.0.0.1"
+  POSTGRES_HOST: "postgres-service"
 ```
 
-Энвы в деплойменте были также обновлены.
+Энвы в деплойменте были также обновлены через `envFrom`.
 
 Также ресурсы NEXTCLOUD были обновлены командами:
 

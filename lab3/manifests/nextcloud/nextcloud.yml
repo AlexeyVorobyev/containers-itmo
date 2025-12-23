@@ -54,43 +54,15 @@ spec:
           periodSeconds: 20
           timeoutSeconds: 3
           failureThreshold: 3
-        env:
-        - name: NEXTCLOUD_UPDATE
-          valueFrom:
-            configMapKeyRef:
-              name: nextcloud-configmap
-              key: NEXTCLOUD_UPDATE
-        - name: ALLOW_EMPTY_PASSWORD
-          value: 'yes'
-        - name: POSTGRES_HOST
-          value: postgres-service
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-configmap
-              key: POSTGRES_DB
-        - name: NEXTCLOUD_TRUSTED_DOMAINS
-          valueFrom:
-            configMapKeyRef:
-              name: nextcloud-configmap
-              key: NEXTCLOUD_TRUSTED_DOMAINS
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_PASSWORD
-        - name: NEXTCLOUD_ADMIN_USER
-          value: any_name_you_want
-        - name: NEXTCLOUD_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: nextcloud-secret
-              key: NEXTCLOUD_ADMIN_PASSWORD
+        envFrom:
+        - configMapRef:
+            name: nextcloud-configmap
+        - configMapRef:
+            name: postgres-configmap
+        - secretRef:
+            name: postgres-secret
+        - secretRef:
+            name: nextcloud-secret
         imagePullPolicy: IfNotPresent
       restartPolicy: Always
       dnsPolicy: ClusterFirst
